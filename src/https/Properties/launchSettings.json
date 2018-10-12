@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "https": {
+      "commandName": "Project",
+      "commandLineArgs": "post jdb-reflect.azurewebsites.net --xml \"foo=bar\" \"lorem=ips=um\" \"Cache-Control:no-cache\""
+    }
+  }
+}
