@@ -4,10 +4,30 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
+  </PropertyGroup>
 
+  <PropertyGroup>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionSuffix>local</VersionSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>https</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
+    <Description>Simple CLI for sending HTTP requests</Description>
+    <Copyright>Copyright (c) 2018 joncloud (jdberube@gmail.com)</Copyright>
+    <AssemblyTitle>https</AssemblyTitle>
+    <Authors>joncloud</Authors>
+    <AssemblyName>https</AssemblyName>
+    <PackageId>https</PackageId>
+    <PackageTags>CLI;HTTP;Request;Simple</PackageTags>
+    <PackageReleaseNotes>https://github.com/joncloud/https/releases</PackageReleaseNotes>
+    <!--<PackageIconUrl>https://raw.githubusercontent.com/joncloud/https/master/nuget.png</PackageIconUrl>-->
+    <PackageProjectUrl>https://github.com/joncloud/https</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/joncloud/https/master/LICENSE.md</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/joncloud/https</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
