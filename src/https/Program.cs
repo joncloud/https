@@ -219,8 +219,6 @@ namespace Https
                     }
                 }
 
-                renderer.WriteRequest(request);
-
                 try
                 {
                     var response = await http.SendAsync(request);
@@ -357,15 +355,15 @@ namespace Https
             _info = info;
         }
 
-        public void WriteRequest(HttpRequestMessage request)
-        {
-            _info.Write(request.Method);
-            _info.Write(" ");
-            _info.WriteLine(request.RequestUri);
-        }
-
         public async Task WriteResponse(HttpResponseMessage response)
         {
+            _info.Write("HTTP/");
+            _info.Write(response.Version);
+            _info.Write(" ");
+            _info.Write((int)response.StatusCode);
+            _info.Write(" ");
+            _info.WriteLine(response.ReasonPhrase);
+
             WriteHeaders(response.Headers, response.Content.Headers);
             await ResponseContentFormatter.As(response, _output);
         }
@@ -373,22 +371,14 @@ namespace Https
         public void WriteHeaders(HttpResponseHeaders responseHeaders, HttpContentHeaders contentHeaders)
         {
             var headers = responseHeaders.Concat(contentHeaders);
-
-            var maxLength = headers.Select(header => header.Key.Length).Max();
-
+            
             foreach (var header in headers)
             {
-                var delta = maxLength - header.Key.Length - 1;
-
                 foreach (var value in header.Value)
                 {
                     _info.Write(header.Key);
                     _info.Write(":");
-                    if (delta > 0)
-                    {
-                        _info.Write(new string(' ', delta));
-                    }
-                    _info.Write("\t");
+                    _info.Write(" ");
                     _info.WriteLine(value);
                 }
             }
