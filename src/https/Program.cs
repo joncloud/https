@@ -131,9 +131,12 @@ namespace Https
         {
             var stream = _stdout();
             var writer = new StreamWriter(stream) { AutoFlush = true };
+            writer.Write("dotnet-https ");
+            writer.WriteLine(typeof(Program).Assembly.GetName().Version);
             writer.WriteLine("https [method] [uri] [options] [content]");
             writer.WriteLine("For example https put httpbin.org/put hello=world");
             writer.WriteLine("");
+
             writer.Flush();
         }
 
