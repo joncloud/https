@@ -5,9 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
 using Utf8Json;
 
@@ -128,7 +126,7 @@ namespace Https
                 }
             }
         }
-        
+
         void Help()
         {
             var stream = _stdout();
@@ -158,6 +156,11 @@ namespace Https
         readonly Func<Stream> _stdin;
         readonly Func<Stream> _stdout;
         readonly bool _useStdin;
+        public Program()
+            : this(Console.OpenStandardError, Console.OpenStandardInput, Console.OpenStandardOutput, Console.IsInputRedirected)
+        {
+
+        }
         public Program(Func<Stream> stderr, Func<Stream> stdin, Func<Stream> stdout, bool useStdin)
         {
             _stderr = stderr;
@@ -167,8 +170,7 @@ namespace Https
         }
 
         public static Task<int> Main(string[] args) =>
-            new Program(Console.OpenStandardError, Console.OpenStandardInput, Console.OpenStandardOutput, Console.IsInputRedirected)
-                .RunAsync(args);
+            new Program().RunAsync(args);
 
         public async Task<int> RunAsync(string[] args)
         {
@@ -207,8 +209,16 @@ namespace Https
             var stdoutWriter = new StreamWriter(stdout) { AutoFlush = true };
             {
                 var renderer = new Renderer(stdoutWriter, stderrWriter);
+                
+                var http = options.IgnoreCertificate
+                    ? new HttpClient(
+                        new HttpClientHandler
+                        {
+                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                        }
+                    )
+                    : new HttpClient();
 
-                var http = new HttpClient();
                 var request = new HttpRequestMessage(
                     command.Method ?? HttpMethod.Get,
                     command.Uri
@@ -277,16 +287,19 @@ namespace Https
     {
         public ContentType RequestContentType { get; }
         public string XmlRootName { get; }
+        public bool IgnoreCertificate { get; }
 
-        public Options(ContentType requestContentType, string xmlRootName)
+        public Options(ContentType requestContentType, string xmlRootName, bool ignoreCertificate)
         {
             RequestContentType = requestContentType;
             XmlRootName = xmlRootName;
+            IgnoreCertificate = ignoreCertificate;
         }
         public static Options Parse(IEnumerable<string> args)
         {
             var requestContentType = ContentType.Json;
             var xmlRootName = default(string);
+            var ignoreCertificate = false;
             foreach (var arg in args)
             {
                 if (arg.StartsWith("--json"))
@@ -314,8 +327,12 @@ namespace Https
                 {
                     requestContentType = ContentType.FormUrlEncoded;
                 }
+                else if (arg.StartsWith("--ignore-certificate"))
+                {
+                    ignoreCertificate = true;
+                }
             }
-            return new Options(requestContentType, xmlRootName);
+            return new Options(requestContentType, xmlRootName, ignoreCertificate);
         }
     }
 
@@ -411,10 +428,18 @@ namespace Https
             }
         }
 
-        public void WriteException(Exception ex) =>
-            WriteException(ex, 0);
-
-        public void WriteException(Exception ex, int depth)
+        public void WriteException(Exception ex)
+        {
+            var help = WriteException(ex, 0);
+            switch (help)
+            {
+                case ExceptionHelp.IgnoreCertificate:
+                    _info.WriteLine("Ensure you trust the server certificate or try using the --ignore-certificate flag");
+                    break;
+            }
+        }
+        
+        ExceptionHelp WriteException(Exception ex, int depth)
         {
             if (depth > 0)
             {
@@ -422,10 +447,30 @@ namespace Https
             }
             _info.WriteLine(ex.Message);
 
+            var exceptionHelp = ExceptionHelp.None;
+            switch (ex.Message)
+            {
+                case "The SSL connection could not be established, see inner exception.":
+                    exceptionHelp = ExceptionHelp.IgnoreCertificate;
+                    break;
+            }
+
             if (ex.InnerException != null)
             {
-                WriteException(ex.InnerException, depth + 1);
+                var otherHelp = WriteException(ex.InnerException, depth + 1);
+                if (otherHelp != ExceptionHelp.None)
+                {
+                    return otherHelp;
+                }
             }
+
+            return exceptionHelp;
+        }
+
+        enum ExceptionHelp
+        {
+            None = 0,
+            IgnoreCertificate = 1,
         }
     }
 
