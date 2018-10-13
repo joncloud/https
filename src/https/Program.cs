@@ -129,9 +129,14 @@ namespace Https
             }
         }
         
-        static void Help()
+        void Help()
         {
-            Console.WriteLine("https [method] [uri] [options] [content]");
+            var stream = _stdout();
+            var writer = new StreamWriter(stream) { AutoFlush = true };
+            writer.WriteLine("https [method] [uri] [options] [content]");
+            writer.WriteLine("For example https put httpbin.org/put hello=world");
+            writer.WriteLine("");
+            writer.Flush();
         }
 
         static void AddHeaders(HttpRequestMessage request, IEnumerable<Content> contents)
@@ -173,7 +178,19 @@ namespace Https
                 return 1;
             }
 
-            if (!Command.TryParse(args[0], args[1], out var command))
+            var command = default(Command);
+            if (args.Length > 1)
+            {
+                if (!Command.TryParse(args[0], args[1], out command))
+                {
+                    if (!Command.TryParse(args[0], out command))
+                    {
+                        Help();
+                        return 1;
+                    }
+                }
+            }
+            else if (!Command.TryParse(args[0], out command))
             {
                 Help();
                 return 1;
@@ -430,7 +447,7 @@ namespace Https
         }
 
         static bool StartsWithHttp(string s) =>
-            s.Length > 4 && s[0] == 'h' && s[1] == 't' && s[2] == 't' && s[3] == 'p';
+            s.Length > 6 && s[0] == 'h' && s[1] == 't' && s[2] == 't' && s[3] == 'p' && (s[4] == ':' || (s[4] == 's' && s[5] == ':'));
 
         static bool TryParseUri(string s, out Uri uri)
         {
