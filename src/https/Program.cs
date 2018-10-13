@@ -219,6 +219,16 @@ namespace Https
                     }
                 }
 
+                if (!request.Headers.UserAgent.Any())
+                {
+                    request.Headers.UserAgent.Add(
+                        new ProductInfoHeaderValue(
+                            "dotnet-https",
+                            typeof(Program).Assembly.GetName().Version.ToString()
+                        )
+                    );
+                }
+
                 try
                 {
                     var response = await http.SendAsync(request);
