@@ -359,24 +359,38 @@ namespace Https
 
         public static bool TryParse(string s, out Content content)
         {
-            var index = s.IndexOf('=');
-            var contentType = default(ContentLocation);
-            if (index == -1)
+            var equalsIndex = s.IndexOf('=');
+            var colonIndex = s.IndexOf(':');
+            if (equalsIndex == -1 && colonIndex == -1)
             {
-                index = s.IndexOf(':');
-                if (index == -1)
+                content = default;
+                return false;
+            }
+
+            var contentType = default(ContentLocation);
+            var index = default(int);
+            if (equalsIndex > -1 && colonIndex > -1)
+            {
+                if (equalsIndex < colonIndex)
                 {
-                    content = default;
-                    return false;
+                    contentType = ContentLocation.Body;
+                    index = equalsIndex;
                 }
                 else
                 {
                     contentType = ContentLocation.Header;
+                    index = colonIndex;
                 }
+            }
+            else if (equalsIndex > -1)
+            {
+                contentType = ContentLocation.Body;
+                index = equalsIndex;
             }
             else
             {
-                contentType = ContentLocation.Body;
+                contentType = ContentLocation.Header;
+                index = colonIndex;
             }
 
             var property = s.Substring(0, index);
