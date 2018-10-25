@@ -10,7 +10,7 @@ Released under the MIT License. See the [LICENSE][] File for further details.
 ## Installation
 Install `https` as a global .NET tool using
 ```bash
-dotnet tool install --global https --version 0.1.0-beta
+dotnet tool install --global https --version 0.1.1-beta
 ```
 
 ## Usage
@@ -60,7 +60,7 @@ Content-Length: 423
     "Content-Length": "17",
     "Content-Type": "application/json; charset=utf-8",
     "Host": "httpbin.org",
-    "User-Agent": "dotnet-https/0.1.0.0",
+    "User-Agent": "dotnet-https/0.1.1.0",
     "X-Content": "content-x"
   },
   "json": {
