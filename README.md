@@ -17,7 +17,26 @@ dotnet tool install --global https --version 0.1.0-beta
 Urls without a protocol, i.e., `http://` or `https://`, by default will be assigns the `https://` protocol.
 
 ```bash
-https [method] [uri] [options] [content]
+Usage: https <METHOD> <URI> [options] [content]
+
+Submits HTTP requests. For example https put httpbin.org/put hello=world
+
+Arguments:
+  <METHOD>    HTTP method, i.e., get, head, post
+  <URI>       URI to send the request to. Leaving the protocol off the URI defaults to https://
+
+Options:
+  --form                Renders the content arguments as application/x-www-form-urlencoded
+  --help                Show command line help.
+  --ignore-certificate  Prevents server certificate validation.
+  --json                Renders the content arguments as application/json.
+  --timeout <VALUE>     Sets the timeout of the request using System.TimeSpan.TryParse (https://docs.microsoft.com/en-us/dotnet/api/system.timespan.parse)
+  --version             Displays the application verison.
+  --xml <ROOT_NAME>     Renders the content arguments as application/xml using the optional xml root name.
+
+Content:
+Repeat as many content arguments to create content sent with the HTTP request. Alternatively pipe raw content send as the HTTP request content.
+  <KEY>=<VALUE>
 ```
 
 For example `https put httpbin.org/put hello=world` will output:
