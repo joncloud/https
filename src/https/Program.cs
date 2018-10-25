@@ -127,14 +127,37 @@ namespace Https
             }
         }
 
-        void Help()
+        void Version()
         {
             var stream = _stdout();
             var writer = new StreamWriter(stream) { AutoFlush = true };
             writer.Write("dotnet-https ");
             writer.WriteLine(typeof(Program).Assembly.GetName().Version);
-            writer.WriteLine("https [method] [uri] [options] [content]");
-            writer.WriteLine("For example https put httpbin.org/put hello=world");
+            writer.Flush();
+        }
+
+        void Help()
+        {
+            var stream = _stdout();
+            var writer = new StreamWriter(stream) { AutoFlush = true };
+            writer.WriteLine("Usage: https <METHOD> <URI> [options] [content]");
+            writer.WriteLine("");
+            writer.WriteLine("Submits HTTP requests. For example https put httpbin.org/put hello=world");
+            writer.WriteLine("");
+            writer.WriteLine("Arguments:");
+            writer.WriteLine("  <METHOD>    HTTP method, i.e., get, head, post");
+            writer.WriteLine("  <URI>       URI to send the request to. Leaving the protocol off the URI defaults to https://");
+            writer.WriteLine("");
+            writer.WriteLine("Options:");
+            foreach (var option in Options.GetOptionHelp())
+            {
+                writer.Write("  ");
+                writer.WriteLine(option);
+            }
+            writer.WriteLine("");
+            writer.WriteLine("Content:");
+            writer.WriteLine("Repeat as many content arguments to create content sent with the HTTP request. Alternatively pipe raw content send as the HTTP request content.");
+            writer.WriteLine("  <KEY>=<VALUE>");
             writer.WriteLine("");
 
             writer.Flush();
@@ -175,6 +198,24 @@ namespace Https
         public static Task<int> Main(string[] args) =>
             new Program().RunAsync(args);
 
+        int HandleOptionsOnly(string[] args)
+        {
+            var options = Options.Parse(args);
+            if (options.Help)
+            {
+                Help();
+                return 0;
+            }
+            else if(options.Version)
+            {
+                Version();
+                return 0;
+            }
+
+            Help();
+            return 1;
+        }
+
         public async Task<int> RunAsync(string[] args)
         {
             if (!args.Any())
@@ -190,19 +231,27 @@ namespace Https
                 {
                     if (!Command.TryParse(args[0], out command))
                     {
-                        Help();
-                        return 1;
+                        return HandleOptionsOnly(args);
                     }
                 }
             }
             else if (!Command.TryParse(args[0], out command))
             {
-                Help();
-                return 1;
+                return HandleOptionsOnly(args);
             }
 
             var optionArgs = args.Skip(2).TakeWhile(x => x.Length > 0 && x[0] == '-');
             var options = Options.Parse(optionArgs);
+            if (options.Help)
+            {
+                Help();
+                return 0;
+            }
+            else if (options.Version)
+            {
+                Version();
+                return 0;
+            }
 
             var contentArgs = args.Skip(2).SkipWhile(x => x.Length > 0 && x[0] == '-');
 
@@ -302,20 +351,39 @@ namespace Https
         public string XmlRootName { get; }
         public bool IgnoreCertificate { get; }
         public TimeSpan? Timeout { get; }
+        public bool Version { get; }
+        public bool Help { get; }
 
-        public Options(ContentType requestContentType, string xmlRootName, bool ignoreCertificate, TimeSpan? timeout)
+
+        public Options(ContentType requestContentType, string xmlRootName, bool ignoreCertificate, TimeSpan? timeout, bool version, bool help)
         {
             RequestContentType = requestContentType;
             XmlRootName = xmlRootName;
             IgnoreCertificate = ignoreCertificate;
             Timeout = timeout;
+            Version = version;
+            Help = help;
         }
+
+        public static IEnumerable<string> GetOptionHelp()
+        {
+            yield return "--form                Renders the content arguments as application/x-www-form-urlencoded";
+            yield return "--help                Show command line help.";
+            yield return "--ignore-certificate  Prevents server certificate validation.";
+            yield return "--json                Renders the content arguments as application/json.";
+            yield return "--timeout <VALUE>     Sets the timeout of the request using System.TimeSpan.TryParse (https://docs.microsoft.com/en-us/dotnet/api/system.timespan.parse)";
+            yield return "--version             Displays the application verison.";
+            yield return "--xml <ROOT_NAME>     Renders the content arguments as application/xml using the optional xml root name.";
+        }
+
         public static Options Parse(IEnumerable<string> args)
         {
             var requestContentType = ContentType.Json;
             var xmlRootName = default(string);
             var ignoreCertificate = false;
             var timeout = default(TimeSpan?);
+            var help = false;
+            var version = false;
             foreach (var arg in args)
             {
                 if (arg.StartsWith("--json"))
@@ -359,8 +427,16 @@ namespace Https
                         }
                     }
                 }
+                else if (arg.StartsWith("--version"))
+                {
+                    version = true;
+                }
+                else if (arg.StartsWith("--help"))
+                {
+                    help = true;
+                }
             }
-            return new Options(requestContentType, xmlRootName, ignoreCertificate, timeout);
+            return new Options(requestContentType, xmlRootName, ignoreCertificate, timeout, version, help);
         }
     }
 
@@ -621,6 +697,11 @@ namespace Https
         public static bool TryParse(string s, out Command command)
         {
             s = s.Trim();
+            if (s.StartsWith('-'))
+            {
+                command = default;
+                return false;
+            }
 
             var index = s.IndexOf(' ');
             if (index == -1)
