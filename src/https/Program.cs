@@ -222,6 +222,11 @@ namespace Https
                     )
                     : new HttpClient();
 
+                if (options.Timeout.HasValue)
+                {
+                    http.Timeout = options.Timeout.Value;
+                }
+
                 var request = new HttpRequestMessage(
                     command.Method ?? HttpMethod.Get,
                     command.Uri
@@ -265,6 +270,11 @@ namespace Https
 
                     await renderer.WriteResponse(response);
                 }
+                catch (TaskCanceledException ex)
+                {
+                    renderer.WriteException(ex);
+                    return 1;
+                }
                 catch (HttpRequestException ex)
                 {
                     renderer.WriteException(ex);
@@ -291,18 +301,21 @@ namespace Https
         public ContentType RequestContentType { get; }
         public string XmlRootName { get; }
         public bool IgnoreCertificate { get; }
+        public TimeSpan? Timeout { get; }
 
-        public Options(ContentType requestContentType, string xmlRootName, bool ignoreCertificate)
+        public Options(ContentType requestContentType, string xmlRootName, bool ignoreCertificate, TimeSpan? timeout)
         {
             RequestContentType = requestContentType;
             XmlRootName = xmlRootName;
             IgnoreCertificate = ignoreCertificate;
+            Timeout = timeout;
         }
         public static Options Parse(IEnumerable<string> args)
         {
             var requestContentType = ContentType.Json;
             var xmlRootName = default(string);
             var ignoreCertificate = false;
+            var timeout = default(TimeSpan?);
             foreach (var arg in args)
             {
                 if (arg.StartsWith("--json"))
@@ -334,8 +347,20 @@ namespace Https
                 {
                     ignoreCertificate = true;
                 }
+                else if (arg.StartsWith("--timeout"))
+                {
+                    var index = arg.IndexOf('=');
+                    if (index > -1)
+                    {
+                        var s = arg.Substring(index + 1).Trim();
+                        if (TimeSpan.TryParse(s, out var to) && to > TimeSpan.Zero)
+                        {
+                            timeout = to;
+                        }
+                    }
+                }
             }
-            return new Options(requestContentType, xmlRootName, ignoreCertificate);
+            return new Options(requestContentType, xmlRootName, ignoreCertificate, timeout);
         }
     }
 
@@ -450,6 +475,9 @@ namespace Https
             var help = WriteException(ex, 0);
             switch (help)
             {
+                case ExceptionHelp.Timeout:
+                    _info.WriteLine("Request failed to complete within timeout. Try increasing the timeout with the --timeout flag");
+                    break;
                 case ExceptionHelp.IgnoreCertificate:
                     _info.WriteLine("Ensure you trust the server certificate or try using the --ignore-certificate flag");
                     break;
@@ -465,11 +493,18 @@ namespace Https
             _info.WriteLine(ex.Message);
 
             var exceptionHelp = ExceptionHelp.None;
-            switch (ex.Message)
+            if (ex is TaskCanceledException)
             {
-                case "The SSL connection could not be established, see inner exception.":
-                    exceptionHelp = ExceptionHelp.IgnoreCertificate;
-                    break;
+                return ExceptionHelp.Timeout;
+            }
+            else
+            {
+                switch (ex.Message)
+                {
+                    case "The SSL connection could not be established, see inner exception.":
+                        exceptionHelp = ExceptionHelp.IgnoreCertificate;
+                        break;
+                }
             }
 
             if (ex.InnerException != null)
@@ -488,6 +523,7 @@ namespace Https
         {
             None = 0,
             IgnoreCertificate = 1,
+            Timeout = 2
         }
     }
 
