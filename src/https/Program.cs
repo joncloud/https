@@ -371,9 +371,9 @@ namespace Https
             yield return "--help                Show command line help.";
             yield return "--ignore-certificate  Prevents server certificate validation.";
             yield return "--json                Renders the content arguments as application/json.";
-            yield return "--timeout <VALUE>     Sets the timeout of the request using System.TimeSpan.TryParse (https://docs.microsoft.com/en-us/dotnet/api/system.timespan.parse)";
+            yield return "--timeout=<VALUE>     Sets the timeout of the request using System.TimeSpan.TryParse (https://docs.microsoft.com/en-us/dotnet/api/system.timespan.parse)";
             yield return "--version             Displays the application verison.";
-            yield return "--xml <ROOT_NAME>     Renders the content arguments as application/xml using the optional xml root name.";
+            yield return "--xml=<ROOT_NAME>     Renders the content arguments as application/xml using the optional xml root name.";
         }
 
         static int GetArgValueIndex(string arg)
