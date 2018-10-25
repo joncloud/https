@@ -324,6 +324,11 @@ namespace Https
                     renderer.WriteException(ex);
                     return 1;
                 }
+                catch (OperationCanceledException ex)
+                {
+                    renderer.WriteException(ex);
+                    return 1;
+                }
                 catch (HttpRequestException ex)
                 {
                     renderer.WriteException(ex);
@@ -580,7 +585,7 @@ namespace Https
             _info.WriteLine(ex.Message);
 
             var exceptionHelp = ExceptionHelp.None;
-            if (ex is TaskCanceledException)
+            if (ex is TaskCanceledException || ex is OperationCanceledException)
             {
                 return ExceptionHelp.Timeout;
             }
