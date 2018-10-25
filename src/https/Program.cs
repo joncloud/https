@@ -376,6 +376,17 @@ namespace Https
             yield return "--xml <ROOT_NAME>     Renders the content arguments as application/xml using the optional xml root name.";
         }
 
+        static int GetArgValueIndex(string arg)
+        {
+            var equalsIndex = arg.IndexOf('=');
+            var spaceIndex = arg.IndexOf(' ');
+            var index = equalsIndex > -1 && spaceIndex > -1
+                ? Math.Min(equalsIndex, spaceIndex)
+                : Math.Max(equalsIndex, spaceIndex);
+
+            return index == -1 ? index : index + 1;
+        }
+
         public static Options Parse(IEnumerable<string> args)
         {
             var requestContentType = ContentType.Json;
@@ -392,14 +403,14 @@ namespace Https
                 }
                 else if (arg.StartsWith("--xml"))
                 {
-                    var index = arg.IndexOf('=');
+                    var index = GetArgValueIndex(arg);
                     if (index == -1)
                     {
                         xmlRootName = "xml";
                     }
                     else
                     {
-                        xmlRootName = arg.Substring(index + 1).Trim();
+                        xmlRootName = arg.Substring(index).Trim();
                         if (string.IsNullOrEmpty(xmlRootName))
                         {
                             xmlRootName = "xml";
@@ -417,10 +428,10 @@ namespace Https
                 }
                 else if (arg.StartsWith("--timeout"))
                 {
-                    var index = arg.IndexOf('=');
+                    var index = GetArgValueIndex(arg);
                     if (index > -1)
                     {
-                        var s = arg.Substring(index + 1).Trim();
+                        var s = arg.Substring(index).Trim();
                         if (TimeSpan.TryParse(s, out var to) && to > TimeSpan.Zero)
                         {
                             timeout = to;
