@@ -1,4 +1,6 @@
 # https
+[![NuGet](https://img.shields.io/nuget/v/https.svg)](https://www.nuget.org/packages/https/)
+
 ## Description
 `https` is a simple CLI for sending HTTP requests.
 
