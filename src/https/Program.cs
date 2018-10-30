@@ -447,7 +447,7 @@ namespace Https
                 {
                     version = true;
                 }
-                else if (arg.StartsWith("--help"))
+                else if (arg.StartsWith("--help") || arg.StartsWith("-?") || arg.StartsWith("help"))
                 {
                     help = true;
                 }
@@ -713,7 +713,7 @@ namespace Https
         public static bool TryParse(string s, out Command command)
         {
             s = s.Trim();
-            if (s.StartsWith('-'))
+            if (s.StartsWith('-') || s == "help")
             {
                 command = default;
                 return false;
