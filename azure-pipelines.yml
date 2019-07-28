@@ -25,6 +25,7 @@ steps:
     packagesToPack: '**/https.csproj'
     configuration: $(buildConfiguration)
     packDirectory: $(build.ArtifactStagingDirectory)
+    versioningScheme: byBuildNumber
 
 - task: DotNetCoreCLI@2
   displayName: Test https
