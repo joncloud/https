@@ -1,0 +1,39 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: DotNetCoreInstaller@1
+  displayName: Install .NET Core 3.0 Preview
+  inputs:
+    includePreviewVersions: true
+    packageType: sdk
+    version: 3.0.100-preview7-012821
+
+- task: DotNetCoreCLI@2
+  displayName: Pack https
+  inputs:
+    command: pack
+    publishWebProjects: false
+    projects: '**/*.csproj'
+    arguments: --configuration $(buildConfiguration) --output $(build.ArtifactStagingDirectory)
+
+- task: DotNetCoreCLI@2
+  displayName: Test https
+  inputs:
+    command: test
+    projects: '**/*Test*.csproj'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(build.ArtifactStagingDirectory)'
+    ArtifactName: 'https'
+    Parallel: true
+
