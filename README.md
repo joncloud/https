@@ -12,7 +12,7 @@ Released under the MIT License. See the [LICENSE][] File for further details.
 ## Installation
 Install `https` as a global .NET tool using
 ```bash
-dotnet tool install --global https --version 0.1.1-beta
+dotnet tool install --global https --version 0.1.2-*
 ```
 
 ## Usage
