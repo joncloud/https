@@ -18,18 +18,10 @@ namespace Https.Tests
                 "post", _fixture.Url, "--json", "foo=bar", "lorem=ipsum"
             };
 
-            using (var stdin = new MemoryStream())
-            using (var stdout = new MemoryStream())
-            using (var stderr = new MemoryStream())
-            {
-                await new Program(() => stderr, () => stdin, () => stdout, false)
-                    .RunAsync(args);
+            var result = await Https.ExecuteAsync(args);
 
-                stdout.Position = 0;
-                var json = new StreamReader(stdout).ReadToEnd();
-                Assert.Equal("{\"foo\":\"bar\",\"lorem\":\"ipsum\"}", json);
-                stderr.Position = 0;
-            }
+            var json = new StreamReader(result.StdOut).ReadToEnd();
+            Assert.Equal("{\"foo\":\"bar\",\"lorem\":\"ipsum\"}", json);
         }
     }
 }
