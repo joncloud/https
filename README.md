@@ -1,5 +1,6 @@
 # https
 [![NuGet](https://img.shields.io/nuget/v/https.svg)](https://www.nuget.org/packages/https/)
+[![Build Status](https://dev.azure.com/joncloud/joncloud-github/_apis/build/status/joncloud.https?branchName=master)](https://dev.azure.com/joncloud/joncloud-github/_build/latest?definitionId=13&branchName=master)
 
 ## Description
 `https` is a simple CLI for sending HTTP requests.
