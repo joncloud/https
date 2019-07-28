@@ -22,14 +22,15 @@ steps:
   inputs:
     command: pack
     publishWebProjects: false
-    projects: '**/*.csproj'
-    arguments: --configuration $(buildConfiguration) --output $(build.ArtifactStagingDirectory)
+    packagesToPack: '**/https.csproj'
+    configuration: $(buildConfiguration)
+    packDirectory: $(build.ArtifactStagingDirectory)
 
 - task: DotNetCoreCLI@2
   displayName: Test https
   inputs:
     command: test
-    projects: '**/*Test*.csproj'
+    projects: '**/https.Tests.csproj'
 
 - task: PublishBuildArtifacts@1
   inputs:
