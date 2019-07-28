@@ -261,20 +261,8 @@ namespace Https
             var stdoutWriter = new StreamWriter(stdout) { AutoFlush = true };
             {
                 var renderer = new Renderer(stdoutWriter, stderrWriter);
-                
-                var http = options.IgnoreCertificate
-                    ? new HttpClient(
-                        new HttpClientHandler
-                        {
-                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-                        }
-                    )
-                    : new HttpClient();
 
-                if (options.Timeout.HasValue)
-                {
-                    http.Timeout = options.Timeout.Value;
-                }
+                var http = CreateHttpClient(options);
 
                 var request = new HttpRequestMessage(
                     command.Method ?? HttpMethod.Get,
@@ -341,6 +329,35 @@ namespace Https
 
             return 0;
         }
+
+        static HttpClient CreateHttpClient(Options options)
+        {
+            var http = default(HttpClient);
+            if (options.RequiresHandler)
+            {
+                var handler = new HttpClientHandler();
+                if (options.IgnoreCertificate)
+                {
+                    handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+                }
+                if (options.StopAutoRedirects)
+                {
+                    handler.AllowAutoRedirect = false;
+                }
+                http = new HttpClient(handler);
+            }
+            else
+            {
+                http = new HttpClient();
+            }
+
+            if (options.Timeout.HasValue)
+            {
+                http.Timeout = options.Timeout.Value;
+            }
+
+            return http;
+        }
     }
 
     enum ContentType
@@ -358,9 +375,11 @@ namespace Https
         public TimeSpan? Timeout { get; }
         public bool Version { get; }
         public bool Help { get; }
+        public bool StopAutoRedirects { get; }
 
+        public bool RequiresHandler => IgnoreCertificate || StopAutoRedirects;
 
-        public Options(ContentType requestContentType, string xmlRootName, bool ignoreCertificate, TimeSpan? timeout, bool version, bool help)
+        public Options(ContentType requestContentType, string xmlRootName, bool ignoreCertificate, TimeSpan? timeout, bool version, bool help, bool stopAutoRedirects)
         {
             RequestContentType = requestContentType;
             XmlRootName = xmlRootName;
@@ -368,6 +387,7 @@ namespace Https
             Timeout = timeout;
             Version = version;
             Help = help;
+            StopAutoRedirects = stopAutoRedirects;
         }
 
         public static IEnumerable<string> GetOptionHelp()
@@ -379,6 +399,7 @@ namespace Https
             yield return "--timeout=<VALUE>     Sets the timeout of the request using System.TimeSpan.TryParse (https://docs.microsoft.com/en-us/dotnet/api/system.timespan.parse)";
             yield return "--version             Displays the application verison.";
             yield return "--xml=<ROOT_NAME>     Renders the content arguments as application/xml using the optional xml root name.";
+            yield return "--stop-auto-redirects Prevents redirects from automatically being processed.";
         }
 
         static int GetArgValueIndex(string arg)
@@ -400,6 +421,7 @@ namespace Https
             var timeout = default(TimeSpan?);
             var help = false;
             var version = false;
+            var stopAutoRedirects = false;
             foreach (var arg in args)
             {
                 if (arg.StartsWith("--json"))
@@ -451,8 +473,12 @@ namespace Https
                 {
                     help = true;
                 }
+                else if (arg.StartsWith("--stop-auto-redirects"))
+                {
+                    stopAutoRedirects = true;
+                }
             }
-            return new Options(requestContentType, xmlRootName, ignoreCertificate, timeout, version, help);
+            return new Options(requestContentType, xmlRootName, ignoreCertificate, timeout, version, help, stopAutoRedirects);
         }
     }
 
