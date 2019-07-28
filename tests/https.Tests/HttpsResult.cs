@@ -33,7 +33,7 @@ namespace Https.Tests
                 if (pos > -1)
                 {
                     var key = line.Substring(0, pos);
-                    var value = line.Substring(pos + 1);
+                    var value = line.Substring(pos + 2);
                     headers[key] = value;
                 }
             }

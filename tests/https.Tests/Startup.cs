@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace Https.Tests
 {
@@ -7,14 +8,12 @@ namespace Https.Tests
     {   
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseMiddleware<RedirectMiddleware>();
+            app.UseMiddleware<MirrorMiddleware>();
+
             app.Run(async (context) =>
             {
-                if (!string.IsNullOrEmpty(context.Request.ContentType))
-                {
-                    context.Response.ContentType = context.Request.ContentType;
-                }
-
-                await context.Request.Body.CopyToAsync(context.Response.Body);
+                await context.Response.WriteAsync("Hello!");
             });
         }
     }
