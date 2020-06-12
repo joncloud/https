@@ -1,5 +1,5 @@
 trigger:
-- master
+- publish
 
 pool:
   vmImage: 'ubuntu-latest'
