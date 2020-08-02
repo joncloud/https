@@ -11,6 +11,12 @@ variables:
   shouldPublish: $[eq(variables['Build.SourceBranch'], 'refs/heads/publish')]
 
 steps:
+- task: UseDotNet@2
+  displayName: Use .NET (global.json)
+  inputs:
+    packageType: 'sdk'
+    useGlobalJson: true
+
 - task: DotNetCoreCLI@2
   displayName: Pack https
   condition: eq(variables.shouldPublish, true)
