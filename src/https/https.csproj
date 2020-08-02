@@ -25,7 +25,7 @@
     <PackageReleaseNotes>https://github.com/joncloud/https/releases</PackageReleaseNotes>
     <!--<PackageIconUrl>https://raw.githubusercontent.com/joncloud/https/master/nuget.png</PackageIconUrl>-->
     <PackageProjectUrl>https://github.com/joncloud/https</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/joncloud/https/master/LICENSE.md</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/joncloud/https</RepositoryUrl>
   </PropertyGroup>
