@@ -6,7 +6,7 @@ namespace Https.Tests
 {
     public class Startup
     {   
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseMiddleware<RedirectMiddleware>();
             app.UseMiddleware<MirrorMiddleware>();

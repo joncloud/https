@@ -10,12 +10,11 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: DotNetCoreInstaller@1
-  displayName: Install .NET Core 3.0 Preview
+- task: PowerShell@2
+  displayName: Test Readme
   inputs:
-    includePreviewVersions: true
-    packageType: sdk
-    version: 3.0.100-preview7-012821
+    filePath: 'TestReadmeVersion.ps1'
+    failOnStderr: true
 
 - task: DotNetCoreCLI@2
   displayName: Pack https
@@ -27,8 +26,8 @@ steps:
     packDirectory: $(build.ArtifactStagingDirectory)
     versioningScheme: byPrereleaseNumber
     majorVersion: 0
-    minorVersion: 1
-    patchVersion: 2
+    minorVersion: 2
+    patchVersion: 0
 
 - task: DotNetCoreCLI@2
   displayName: Test https
@@ -37,6 +36,7 @@ steps:
     projects: '**/https.Tests.csproj'
 
 - task: PublishBuildArtifacts@1
+  displayName: Upload Artifacts
   inputs:
     PathtoPublish: '$(build.ArtifactStagingDirectory)'
     ArtifactName: 'https'
