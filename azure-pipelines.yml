@@ -11,6 +11,7 @@ variables:
 
 steps:
 - task: PowerShell@2
+  displayName: Test Readme
   inputs:
     filePath: 'TestReadmeVersion.ps1'
     failOnStderr: true
@@ -35,6 +36,7 @@ steps:
     projects: '**/https.Tests.csproj'
 
 - task: PublishBuildArtifacts@1
+  displayName: Upload Artifacts
   inputs:
     PathtoPublish: '$(build.ArtifactStagingDirectory)'
     ArtifactName: 'https'
