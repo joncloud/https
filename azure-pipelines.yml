@@ -10,13 +10,6 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: DotNetCoreInstaller@1
-  displayName: Install .NET Core 3.0 Preview
-  inputs:
-    includePreviewVersions: true
-    packageType: sdk
-    version: 3.0.100-preview7-012821
-
 - task: DotNetCoreCLI@2
   displayName: Pack https
   inputs:
@@ -27,8 +20,8 @@ steps:
     packDirectory: $(build.ArtifactStagingDirectory)
     versioningScheme: byPrereleaseNumber
     majorVersion: 0
-    minorVersion: 1
-    patchVersion: 2
+    minorVersion: 2
+    patchVersion: 0
 
 - task: DotNetCoreCLI@2
   displayName: Test https
