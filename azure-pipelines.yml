@@ -10,12 +10,6 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: PowerShell@2
-  displayName: Test Readme
-  inputs:
-    filePath: 'TestReadmeVersion.ps1'
-    failOnStderr: true
-
 - task: DotNetCoreCLI@2
   displayName: Pack https
   inputs:
