@@ -41,6 +41,10 @@ Options:
 Content:
 Repeat as many content arguments to create content sent with the HTTP request. Alternatively pipe raw content send as the HTTP request content.
   <KEY>=<VALUE>
+
+Headers:
+Repeat as many header arguments to assign headers for the HTTP request.
+  <KEY>:<VALUE>
 ```
 
 For example `https put httpbin.org/put hello=world` will output:

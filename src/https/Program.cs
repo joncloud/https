@@ -159,6 +159,10 @@ namespace Https
             writer.WriteLine("Repeat as many content arguments to create content sent with the HTTP request. Alternatively pipe raw content send as the HTTP request content.");
             writer.WriteLine("  <KEY>=<VALUE>");
             writer.WriteLine("");
+            writer.WriteLine("Headers:");
+            writer.WriteLine("Repeat as many header arguments to assign headers for the HTTP request.");
+            writer.WriteLine("  <KEY>:<VALUE>");
+            writer.WriteLine("");
 
             writer.Flush();
         }
