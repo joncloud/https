@@ -36,6 +36,7 @@ Options:
   --timeout=<VALUE>     Sets the timeout of the request using System.TimeSpan.TryParse (https://docs.microsoft.com/en-us/dotnet/api/system.timespan.parse)
   --version             Displays the application verison.
   --xml=<ROOT_NAME>     Renders the content arguments as application/xml using the optional xml root name.
+  --stop-auto-redirects Prevents redirects from automatically being processed.
 
 Content:
 Repeat as many content arguments to create content sent with the HTTP request. Alternatively pipe raw content send as the HTTP request content.
