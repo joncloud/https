@@ -8,10 +8,23 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  shouldPublish: $[eq(variables['Build.SourceBranch'], 'refs/heads/publish')]
 
 steps:
 - task: DotNetCoreCLI@2
   displayName: Pack https
+  condition: eq(variables.shouldPublish, true)
+  inputs:
+    command: pack
+    publishWebProjects: false
+    packagesToPack: '**/https.csproj'
+    configuration: $(buildConfiguration)
+    packDirectory: $(build.ArtifactStagingDirectory)
+    versioningScheme: off
+
+- task: DotNetCoreCLI@2
+  displayName: Pack https
+  condition: eq(variables.shouldPublish, false)
   inputs:
     command: pack
     publishWebProjects: false
