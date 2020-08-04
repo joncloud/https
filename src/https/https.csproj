@@ -8,7 +8,6 @@
 
   <PropertyGroup>
     <VersionPrefix>0.2.0</VersionPrefix>
-    <VersionSuffix>local</VersionSuffix>
   </PropertyGroup>
 
   <PropertyGroup>
