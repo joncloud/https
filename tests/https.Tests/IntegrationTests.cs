@@ -1,5 +1,8 @@
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 using Xunit;
 
 namespace Https.Tests
@@ -11,7 +14,21 @@ namespace Https.Tests
             _fixture = fixture;
 
         [Fact]
-        public async Task MirrorTests()
+        public async Task MirrorTest_ShouldReflectFormUrlEncoded()
+        {
+            var args = new[]
+            {
+                "post", $"{_fixture.Url}/Mirror", "--form", "foo=bar", "lorem=ipsum"
+            };
+
+            var result = await Https.ExecuteAsync(args);
+
+            var actual = new StreamReader(result.StdOut).ReadToEnd();
+            Assert.Equal("foo=bar&lorem=ipsum", actual);
+        }
+
+        [Fact]
+        public async Task MirrorTest_ShouldReflectJson()
         {
             var args = new[]
             {
@@ -20,8 +37,32 @@ namespace Https.Tests
 
             var result = await Https.ExecuteAsync(args);
 
-            var json = new StreamReader(result.StdOut).ReadToEnd();
-            Assert.Equal("{\"foo\":\"bar\",\"lorem\":\"ipsum\"}", json);
+            var actual = new StreamReader(result.StdOut).ReadToEnd();
+            Assert.Equal("{\"foo\":\"bar\",\"lorem\":\"ipsum\"}", actual);
+        }
+
+        [Fact]
+        public async Task MirrorTest_ShouldReflectXml()
+        {
+            var args = new[]
+            {
+                "post", $"{_fixture.Url}/Mirror", "--xml=root", "foo=bar", "lorem=ipsum"
+            };
+
+            var result = await Https.ExecuteAsync(args);
+
+            var expected = new XDocument(
+                new XElement(
+                    "root",
+                    new XElement("foo", "bar"),
+                    new XElement("lorem", "ipsum")
+                )
+            ).ToString();
+            var actual = XDocument.Load(
+                new StreamReader(result.StdOut)
+            ).ToString();
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
