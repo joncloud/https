@@ -41,6 +41,12 @@ steps:
   inputs:
     command: test
     projects: '**/https.Tests.csproj'
+    arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura -- xunit.parallelizeAssembly=true xunit.parallelizeTestCollections=true'
+
+- script: |
+    dotnet tool install dotnet-reportgenerator-globaltool --tool-path tools
+    ./tools/reportgenerator -reports:$(Build.SourcesDirectory)/tests/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Cobertura
+  displayName: Code Coverage Report
 
 - task: PublishBuildArtifacts@1
   displayName: Upload Artifacts
