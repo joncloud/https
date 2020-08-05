@@ -46,7 +46,13 @@ steps:
 - script: |
     dotnet tool install dotnet-reportgenerator-globaltool --tool-path tools
     ./tools/reportgenerator -reports:$(Build.SourcesDirectory)/tests/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Cobertura
-  displayName: Code Coverage Report
+  displayName: Generate Code Coverage Report
+
+- task: PublishCodeCoverageResults@1
+  displayName: Publish Code Coverage Report
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
 
 - task: PublishBuildArtifacts@1
   displayName: Upload Artifacts
