@@ -36,6 +36,10 @@ steps:
     minorVersion: 2
     patchVersion: 0
 
+- script: |
+    dotnet dev-certs https
+  displayName: Setup Tests
+
 - task: DotNetCoreCLI@2
   displayName: Test https
   inputs:

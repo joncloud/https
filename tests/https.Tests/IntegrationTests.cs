@@ -18,7 +18,7 @@ namespace Https.Tests
         {
             var args = new[]
             {
-                "post", $"{_fixture.Url}/Mirror", "--form", "foo=bar", "lorem=ipsum"
+                "post", $"{_fixture.HttpUrl}/Mirror", "--form", "foo=bar", "lorem=ipsum"
             };
 
             var result = await Https.ExecuteAsync(args);
@@ -32,7 +32,7 @@ namespace Https.Tests
         {
             var args = new[]
             {
-                "post", $"{_fixture.Url}/Mirror", "--json", "foo=bar", "lorem=ipsum"
+                "post", $"{_fixture.HttpUrl}/Mirror", "--json", "foo=bar", "lorem=ipsum"
             };
 
             var result = await Https.ExecuteAsync(args);
@@ -46,7 +46,7 @@ namespace Https.Tests
         {
             var args = new[]
             {
-                "post", $"{_fixture.Url}/Mirror", "--xml=root", "foo=bar", "lorem=ipsum"
+                "post", $"{_fixture.HttpUrl}/Mirror", "--xml=root", "foo=bar", "lorem=ipsum"
             };
 
             var result = await Https.ExecuteAsync(args);

@@ -11,12 +11,16 @@ namespace Https.Tests
         readonly IWebHost _webHost;
         readonly Task _task;
         readonly CancellationTokenSource _cts;
-        public string Url { get; }
+        public string HttpUrl { get; }
+        public string HttpsUrl { get; }
 
         public WebHostFixture()
         {
             _webHost = WebHost.CreateDefaultBuilder()
-                .UseUrls(Url = "http://localhost:5000")
+                .UseUrls(
+                    HttpUrl = "http://localhost:5000", 
+                    HttpsUrl = "https://localhost:5001"
+                )
                 .UseStartup<Startup>()
                 .Build();
             _cts = new CancellationTokenSource();
