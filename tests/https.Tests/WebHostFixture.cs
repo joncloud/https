@@ -3,9 +3,13 @@ using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Https.Tests
 {
+    [CollectionDefinition(nameof(WebHostFixture))]
+    public class WebHostCollection : ICollectionFixture<WebHostFixture> { }
+
     public class WebHostFixture : IDisposable
     {
         readonly IWebHost _webHost;

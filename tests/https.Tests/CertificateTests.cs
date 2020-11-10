@@ -4,7 +4,8 @@ using Xunit;
 
 namespace Https.Tests
 {
-    public class CertificateTests : IClassFixture<WebHostFixture>
+    [Collection(nameof(WebHostFixture))]
+    public class CertificateTests
     {
         readonly WebHostFixture _fixture;
         public CertificateTests(WebHostFixture fixture) =>

@@ -3,7 +3,8 @@ using Xunit;
 
 namespace Https.Tests
 {
-    public class RedirectTests : IClassFixture<WebHostFixture>
+    [Collection(nameof(WebHostFixture))]
+    public class RedirectTests
     {
         readonly WebHostFixture _fixture;
         public RedirectTests(WebHostFixture fixture) =>
