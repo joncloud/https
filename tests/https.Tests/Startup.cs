@@ -10,6 +10,7 @@ namespace Https.Tests
         {
             app.UseMiddleware<RedirectMiddleware>();
             app.UseMiddleware<MirrorMiddleware>();
+            app.UseMiddleware<TimeoutMiddleware>();
 
             app.Run(async (context) =>
             {

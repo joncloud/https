@@ -19,13 +19,7 @@ namespace Https.Tests
         [Fact]
         public void Installation_ShouldListSameVersionAsCsproj()
         {
-            var versionPrefixElement = _httpsCsprojFixture.Document
-                .Root
-                .Elements("PropertyGroup")
-                .Elements("VersionPrefix")
-                .FirstOrDefault();
-
-            Assert.NotNull(versionPrefixElement);
+            var versionPrefixElement = _httpsCsprojFixture.VersionPrefix;
 
             var expected = versionPrefixElement.Value;
             var actual = _readmeFixture.Readme.InstallationVersion;

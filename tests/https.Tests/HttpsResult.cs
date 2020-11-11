@@ -9,6 +9,7 @@ namespace Https.Tests
     {
         public int ExitCode { get; }
         public MemoryStream StdOut { get; }
+        public MemoryStream StdErr { get; }
         public string Status { get; }
         public IReadOnlyDictionary<string, string> Headers { get; }
 
@@ -18,6 +19,11 @@ namespace Https.Tests
 
             StdOut = stdout;
             StdOut.Position = 0;
+
+            stderr.Position = 0;
+            StdErr = new MemoryStream();
+            stderr.CopyTo(StdErr);
+            StdErr.Position = 0;
 
             stderr.Position = 0;
             var lines = new StreamReader(stderr)

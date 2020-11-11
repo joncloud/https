@@ -40,15 +40,62 @@ namespace Https.Tests
             Assert.Equal("{\"foo\":\"bar\",\"lorem\":\"ipsum\"}", actual);
         }
 
+        static async Task RunXmlTestAsync(string[] args, XDocument expected)
+        {
+            var result = await Https.ExecuteAsync(args);
+
+            var actual = XDocument.Load(
+                new StreamReader(result.StdOut)
+            ).ToString();
+
+            Assert.Equal(expected.ToString(), actual);
+        }
+
         [Fact]
-        public async Task MirrorTest_ShouldReflectXml()
+        public async Task MirrorTest_ShouldReflectXmlWithDefaultRootElementName()
+        {
+            var args = new[]
+            {
+                "post", $"{_fixture.HttpUrl}/Mirror", "--xml", "foo=bar", "lorem=ipsum"
+            };
+
+            var expected = new XDocument(
+                new XElement(
+                    "xml",
+                    new XElement("foo", "bar"),
+                    new XElement("lorem", "ipsum")
+                )
+            );
+
+            await RunXmlTestAsync(args, expected);
+        }
+
+        [Fact]
+        public async Task MirrorTest_ShouldReflectXmlWithEmptyRootElementName()
+        {
+            var args = new[]
+            {
+                "post", $"{_fixture.HttpUrl}/Mirror", "--xml= ", "foo=bar", "lorem=ipsum"
+            };
+
+            var expected = new XDocument(
+                new XElement(
+                    "xml",
+                    new XElement("foo", "bar"),
+                    new XElement("lorem", "ipsum")
+                )
+            );
+
+            await RunXmlTestAsync(args, expected);
+        }
+
+        [Fact]
+        public async Task MirrorTest_ShouldReflectXmlWithRootElementName()
         {
             var args = new[]
             {
                 "post", $"{_fixture.HttpUrl}/Mirror", "--xml=root", "foo=bar", "lorem=ipsum"
             };
-
-            var result = await Https.ExecuteAsync(args);
 
             var expected = new XDocument(
                 new XElement(
@@ -56,12 +103,9 @@ namespace Https.Tests
                     new XElement("foo", "bar"),
                     new XElement("lorem", "ipsum")
                 )
-            ).ToString();
-            var actual = XDocument.Load(
-                new StreamReader(result.StdOut)
-            ).ToString();
+            );
 
-            Assert.Equal(expected, actual);
+            await RunXmlTestAsync(args, expected);
         }
     }
 }
