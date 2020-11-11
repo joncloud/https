@@ -75,7 +75,7 @@ namespace Https.Tests
         {
             var args = new[]
             {
-                "post", $"{_fixture.HttpUrl}/Mirror", "--xml", "foo=bar", "lorem=ipsum"
+                "post", $"{_fixture.HttpUrl}/Mirror", "--xml= ", "foo=bar", "lorem=ipsum"
             };
 
             var expected = new XDocument(
